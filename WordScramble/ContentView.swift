@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var point = 0
     var body: some View {
         NavigationStack{
             List{
@@ -23,10 +24,14 @@ struct ContentView: View {
                     TextField("Enter your word", text: $newWord)
                         .textInputAutocapitalization(.never)
                 }
+                Section("Point"){
+                    Text("\(point)")
+                }
+                
                 Section{
                     ForEach(usedWord, id: \.self){word in
                         HStack{
-                            Image(systemName: "\(word.count).circle")
+                            Image(systemName: word == rootWord ? "\(word.count).circle" : "checkmark.circle")
                             Text(word)
                         }
                     }
@@ -35,6 +40,9 @@ struct ContentView: View {
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
             .onAppear(perform: startGame)
+            .toolbar{
+                Button("Restart", action: addrootword)
+            }
             .alert(errorTitle, isPresented: $showingError){ } message:{
                 Text(errorMessage)
             }
@@ -62,11 +70,16 @@ struct ContentView: View {
             return
         }
         
+        guard isSame(word: answer) else{
+            wordError(title: "Oh", message: "Its the same word, try samething else")
+            return
+        }
         
         withAnimation{
             usedWord.insert(answer, at: 0)
         }
             newWord = ""
+        addthescore(word: answer)
     }
     
     func startGame(){
@@ -79,6 +92,15 @@ struct ContentView: View {
         }
         
         fatalError("Could net instal start.txt file")
+    }
+    
+    func addrootword(){
+        
+        withAnimation{
+            usedWord.insert(rootWord, at: 0)
+            
+        }
+        startGame()
     }
     
     func isOriginal(word: String) -> Bool {
@@ -111,6 +133,27 @@ struct ContentView: View {
         errorTitle = title
         errorMessage = message
         showingError = true
+    }
+    
+    func isSame(word: String) -> Bool{
+        
+        if word.count < 3 || word == rootWord {
+                return false
+            }
+        return true
+    }
+    
+    func addthescore(word: String){
+        if word.count > 7 {
+            point += 50
+        }
+        else if word.count < 7 && word.count >= 5{
+            point += 30
+        }
+        else {
+            point += 10
+        }
+        
     }
 }
     
