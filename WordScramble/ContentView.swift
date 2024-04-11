@@ -87,20 +87,24 @@ struct ContentView: View {
             if let startWords = try? String(contentsOf: wordsInLink){
                 let allStartWords = startWords.components(separatedBy: "\n")
                 rootWord = allStartWords.randomElement() ?? "bruh"
+                rootWordItem = WordItem(word: rootWord, icon: "checkmark.circle")
+                
+                if showingrootword == true{
+                    if let previousRootWordItem = previousRootWordItem {
+                        withAnimation {
+                            usedWords.insert(previousRootWordItem, at: 0)
+                        }
+                    }
+                }
+                previousRootWordItem = rootWordItem
+                showingrootword = true
+                
+                
                 return
             }
         }
         
-        fatalError("Could net instal start.txt file")
-    }
-    
-    func addrootword(){
-        
-        withAnimation{
-            usedWord.insert(rootWord, at: 0)
-            
-        }
-        startGame()
+        fatalError("Could not install start.txt file")
     }
     
     func isOriginal(word: String) -> Bool {
